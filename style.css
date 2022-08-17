@@ -1,0 +1,46 @@
+.CodeMirror {
+    border: solid 1px #999;
+    height: 20em;
+    resize: vertical;
+    font-size: 16px;
+}
+
+p {
+    margin: 0;
+}
+
+#output {
+    border: solid 1px #999;
+    margin: 0;
+    padding: 0.2em;
+    height: 20em;
+    resize: vertical;
+    overflow: auto;
+    scroll-behavior: smooth;
+    font-size: 16px;
+}
+
+#output .original_error {
+    color: #f00;
+}
+
+#output .caution {
+    color: #666;
+}
+
+#output .error_type {
+    background-color: #f00;
+    color: #fff;
+    padding: 0.2em;
+    line-height: 1.4em;
+    font-weight: bold;
+}
+
+#output .location {
+    font-weight: bold;
+}
+
+#output .script {
+    color: #090;
+}
+

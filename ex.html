@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.css" />
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.21.0/full/pyodide.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/mode/python/python.min.js"></script>
+    <script>
+      const python_packages = ["numpy", "scipy", "scikit-learn", "networkx", "matplotlib"];
+    </script>
+    <title>Python 実行環境（numpy, matplotlib 等利用可能）</title>
+    <meta name="description" content="ブラウザ上で完結する Python 実行環境です。エラーメッセージ日本語表示。numpy, matplotlib 等も使用可能。" />
+  </head>
+
+  <body>
+    <textarea id="txt-editor">print("Hello, World!")</textarea>
+    <p>
+        <button onclick="run();" id="run" disabled>準備中</button> 
+        <input type="checkbox" id="reset_output" checked /><label for="reset_output">実行結果を毎回消去する</label> 
+        <button onclick="urlCopy();" id="copy">URL をコピー</button>
+    </p>
+    <p>実行結果:</p>
+    <pre id="output">初期化中...</pre>
+    <script src="script.js"></script>
+  </body>
+</html>
