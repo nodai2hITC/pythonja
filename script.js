@@ -14,6 +14,9 @@ editor.setOption("extraKeys", {
     "Ctrl-Enter": function(cm) {
         run();
     },
+    "Shift-Tab": function(cm) {
+        cm.execCommand("indentLess");
+    }
 });
 if (location.hash != "") {
     editor.setValue(base64decode(location.hash.replace("#", "")));
@@ -117,6 +120,9 @@ async function evaluatePython() {
         outputError(err.toString());
     } finally {
         enableRunButton();
+        if (python_packages.includes("matplotlib")){
+            pyodide.runPython(`matplotlib.pyplot.clf()`);
+        }
     }
 }
 
