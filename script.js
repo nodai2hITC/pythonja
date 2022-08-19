@@ -147,7 +147,8 @@ function outputError(error) {
         from: { line: lineno - 1, ch: 0 },
         to: { line: lineno - 1, ch: 999 },
         message: getMessage(message, type),  
-    }]
+    }];
+    editor.performLint();
     addToOutput('<span class="caution">上に表示されているのが本来のエラーメッセージです。エラーについて調べる場合は、上のエラーメッセージで検索して下さい。</span>');
     addToOutput('<span class="error_type">' + escapeHTML(getErrorType(type)) + '</span>');
     addToOutput('<span class="location">' + escapeHTML(getFileName(filename)) + 'の ' + escapeHTML(lineno) + ' 行目でエラーが発生しました。</span>');
