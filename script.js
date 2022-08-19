@@ -1,9 +1,17 @@
 "use strict";
 
+let lint_data = [];
+
+function lint(text) {
+    return lint_data;
+}
+
 const editor = CodeMirror.fromTextArea(document.getElementById("txt-editor"), {
     lineNumbers: true,
     mode: "python",
     indentUnit: 4,
+    gutters: ["CodeMirror-lint-markers"],
+    lint: lint,
     autofocus: true
 });
 editor.setOption("extraKeys", {
@@ -18,6 +26,8 @@ editor.setOption("extraKeys", {
         cm.execCommand("indentLess");
     }
 });
+editor.on("change", function(){ lint_data = []});
+
 if (location.hash != "") {
     editor.setValue(base64decode(location.hash.replace("#", "")));
 }
@@ -132,6 +142,12 @@ function outputError(error) {
 
     if (!filename) return;
 
+    lint_data = [{
+        severity: "error",
+        from: { line: lineno - 1, ch: 0 },
+        to: { line: lineno - 1, ch: 999 },
+        message: getMessage(message, type),  
+    }]
     addToOutput('<span class="caution">上に表示されているのが本来のエラーメッセージです。エラーについて調べる場合は、上のエラーメッセージで検索して下さい。</span>');
     addToOutput('<span class="error_type">' + escapeHTML(getErrorType(type)) + '</span>');
     addToOutput('<span class="location">' + escapeHTML(getFileName(filename)) + 'の ' + escapeHTML(lineno) + ' 行目でエラーが発生しました。</span>');
