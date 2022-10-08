@@ -26,9 +26,23 @@ editor.setOption("extraKeys", {
         cm.execCommand("indentLess");
     }
 });
-editor.on("change", function(){ lint_data = []});
+editor.on("change", function(){
+    lint_data = [];
+    const lines = editor.getValue().split("\n");
+    for (let i = 0; i < lines.length; i++) {
+        const matches = lines[i].matchAll(/[　＋－＊／（）：”’]+/g);
+        for (const match of matches) {
+            lint_data.push({
+                severity: "warning",
+                from: { line: i, ch: match.index },
+                to: { line: i, ch: match.index + match[0].length },
+                message: "全角文字が含まれています。"
+            });
+        }
+    }
+});
 
-if (location.hash != "") {
+if (location.href.indexOf("#") != -1) {
     editor.setValue(base64decode(location.hash.replace("#", "")));
 }
 
@@ -44,9 +58,31 @@ function base64decode(str) {
     return new TextDecoder().decode(Uint8Array.from(uint8arr));
 }
 
+function clearAll() {
+    if (!confirm("白紙の状態に戻します。よろしいですか？")) return;
+    editor.setValue("");
+    editor.focus();
+}
+
 function urlCopy() {
     location.hash = base64encode(editor.getValue());
     navigator.clipboard.writeText(location.href);
+}
+
+function save() {
+    localStorage.setItem("script", editor.getValue());
+}
+
+function load() {
+    const script = localStorage.getItem("script");
+    if (!script) return;
+    if (!confirm("一時保存してあるデータを読み込みます。よろしいですか？")) return;
+    editor.setValue(script);
+}
+
+function download() {
+    const blob = new Blob([editor.getValue()], { type: "text/plain" });
+    document.getElementById("download").href = window.URL.createObjectURL(blob);
 }
 
 const output = document.getElementById("output");
@@ -111,6 +147,7 @@ def new_input(s="入力してください："):
 __builtins__.input = new_input`);
     });
     enableRunButton();
+    addToOutput(escapeHTML("実行の準備ができました。"));
     return pyodide;
 }
 const pyodideReadyPromise = main();
@@ -146,7 +183,7 @@ function outputError(error) {
         severity: "error",
         from: { line: lineno - 1, ch: 0 },
         to: { line: lineno - 1, ch: 999 },
-        message: getMessage(message, type),  
+        message: getMessage(message, type)
     }];
     editor.performLint();
     addToOutput('<span class="caution">上に表示されているのが本来のエラーメッセージです。エラーについて調べる場合は、上のエラーメッセージで検索して下さい。</span>');
