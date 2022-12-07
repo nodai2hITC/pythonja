@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/addon/lint/lint.min.css" />
+    <link rel="stylesheet" href="style.css" />
+    <style>
+.CodeMirror {
+    height: 6.5em;
+}
+    </style>
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.21.0/full/pyodide.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/mode/python/python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/addon/lint/lint.min.js"></script>
+    <script defer src="script.js"></script>
+    <script>
+      const python_packages = [];
+    </script>
+    <title>Python 実行環境</title>
+    <meta name="description" content="ブラウザ上で完結する Python 実行環境です。エラーメッセージ日本語表示。" />
+  </head>
+
+  <body>
+    <textarea id="txt-editor"></textarea>
+    <p class="menu">
+      <button onclick="clearAll();" id="clear">全消去</button>
+      <button onclick="urlCopy();" id="copy">URL をコピー</button> 
+      <button onclick="save();" id="save">一時保存</button> 
+      <button onclick="load();" id="load">一時保存からの読み込み</button> 
+      <a id="download" download="python.py"><button onclick="download();">ダウンロード</button></a> 
+    </p>
+    <p>
+      <button onclick="run();" id="run" disabled>準備中</button> 
+      <input type="checkbox" id="reset_output" checked /><label for="reset_output">実行結果を毎回消去する</label>
+    </p>
+    <p>実行結果:</p>
+    <pre id="output">初期化中...</pre>
+  </body>
+</html>
