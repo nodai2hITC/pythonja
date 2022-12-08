@@ -69,6 +69,10 @@ function urlCopy() {
     navigator.clipboard.writeText(location.href);
 }
 
+function copy() {
+    navigator.clipboard.writeText(editor.getValue());
+}
+
 function save() {
     localStorage.setItem("script", editor.getValue());
 }
