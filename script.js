@@ -284,6 +284,11 @@ function getMessage(msg, error_type) {
         return '内包表記のターゲットをカッコで囲むのを忘れていませんか？';
     if ('invalid non-printable character U+3000' == msg)
         return '全角空白が使われています。半角空白に直してください。';
+    if (m = msg.match(/^invalid character '([（）’”＋－＊／％：＜＞＝！])' \(([^\)]+)\)$/))
+        return '全角の ' + m[1] + ' が使われています。英語入力状態で書き直してください。';
+    if (m = msg.match(/^invalid character '(.)' \(([^\)]+)\)$/))
+        return '不正な文字 ' + m[1] + ' が使われています。';
+
     // IndentationError, TabError
     if ('unexpected indent' == msg)
         return 'インデントが入るべきでない場所に入ってしまっています。';
@@ -323,7 +328,7 @@ function getMessage(msg, error_type) {
     if (m = msg.match(/^([^(]+)\(\) got an unexpected keyword argument '([^']+)'$/))
         return m[1] + '() に \'' + m[2] + '\' という未対応のキーワード引数が与えられています。';
     // ValueError
-    if (m = msg.match(/^invalid literal for int\(\) with base (\d+): (\'[^\']+\')$/))
+    if (m = msg.match(/^invalid literal for int\(\) with base (\d+): (\'[^\']*\')$/))
         return '文字列 ' + m[2] + ' は、' + m[1] + '進法の数値として不適切です。';
     if (m = msg.match(/^could not convert string to float: (\'[^\']+\')$/))
         return '文字列 ' + m[1] + ' を float 型に変換することはできません。';
