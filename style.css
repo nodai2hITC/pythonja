@@ -3,6 +3,7 @@
     height: 20em;
     resize: vertical;
     font-size: 16px;
+    font-family: 'Consolas', 'Menlo', monospace;
 }
 
 p {
@@ -47,4 +48,3 @@ p.menu {
 #output .script {
     color: #090;
 }
-
