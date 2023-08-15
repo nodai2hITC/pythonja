@@ -182,19 +182,20 @@ function outputError(error) {
     addToOutput('<span class="original_error">' + escapeHTML(original_error) + '</span>');
 
     if (!filename) return;
-
+    script = getScript(script, filename, lineno)
+    let error_message = getMessage(message, type, script);
     lint_data = [{
         severity: "error",
         from: { line: lineno - 1, ch: 0 },
         to: { line: lineno - 1, ch: 999 },
-        message: getMessage(message, type)
+        message: error_message
     }];
     editor.performLint();
     addToOutput('<span class="caution">上に表示されているのが本来のエラーメッセージです。エラーについて調べる場合は、上のエラーメッセージで検索して下さい。</span>');
     addToOutput('<span class="error_type">' + escapeHTML(getErrorType(type)) + '</span>');
     addToOutput('<span class="location">' + escapeHTML(getFileName(filename)) + 'の ' + escapeHTML(lineno) + ' 行目でエラーが発生しました。</span>');
-    addToOutput('<span class="script">' + escapeHTML(getScript(script, filename, lineno)).trimEnd() + '</span>');
-    addToOutput('<span class="error_message">' + escapeHTML(getMessage(message, type)) + '</span>');
+    addToOutput('<span class="script">' + escapeHTML(script).trimEnd() + '</span>');
+    addToOutput('<span class="error_message">' + escapeHTML(error_message) + '</span>');
 }
 
 function analyze(error) {
@@ -251,7 +252,7 @@ function getScript(script, filename, lineno) {
     return "    " + editor.getValue().split("\n")[lineno - 1].toString().trim();
 }
 
-function getMessage(msg, error_type) {
+function getMessage(msg, error_type, script) {
     let m;
     // SyntaxError
     if ('invalid syntax' == msg)
@@ -311,7 +312,7 @@ function getMessage(msg, error_type) {
         return '文字列の範囲外を参照しようとしています。文字列の長さと参照しようとした位置を確認してください。';
     // NameError
     if (m = msg.match(/^name '([^\']+)' is not defined. Did you mean: '([^\']+)'\?$/))
-        return '「' + m[1] + '」という名前の変数などは見つかりませんでした。「' + m[2] + '」のスペルミスではありませんか？';
+        return '「' + m[1] + '」という名前の変数などは見つかりませんでした。「' + m[2] + '」の入力ミスではありませんか？';
     if (m = msg.match(/^name '([^\']+)' is not defined$/))
         return '「' + m[1] + '」という名前の変数などは見つかりませんでした。スペルミスや、大文字小文字の打ち間違い等をしていないか確認してください。';
     // TypeError
@@ -329,9 +330,17 @@ function getMessage(msg, error_type) {
         return m[1] + '() は引数（位置引数）を ' + m[2] + '～' + m[3] + ' 個しか受け取りませんが、' + m[4] + ' 個の引数が与えられています。';
     if (m = msg.match(/^([^(]+)\(\) got an unexpected keyword argument '([^']+)'$/))
         return m[1] + '() に \'' + m[2] + '\' という未対応のキーワード引数が与えられています。';
+    if (m = msg.match(/^'([^']+)' object is not callable$/)) {
+        let m2;
+        if (m2 = script.match(/(input|print)\(/))
+            return m2[1] + '関数が上書きされてしまっているため呼び出せません。この行以前で ' + m2[1] + ' という名前の変数を使ってしまっていませんか？';
+        return getType(m[1], '') + 'のデータは () を付けて呼び出すことはできません。'
+    }
     // ValueError
-    if (m = msg.match(/^invalid literal for int\(\) with base (\d+): (\'[^\']*\')$/))
-        return '文字列 ' + m[2] + ' は、' + m[1] + '進法の数値として不適切です。';
+    if (m = msg.match(/^invalid literal for int\(\) with base (\d+): (\'[^\']*\')$/)) {
+        if (m[1] == '10') return '文字列 ' + m[2] + ' は、int型（整数）に変換することができません。';
+        else              return '文字列 ' + m[2] + ' は、' + m[1] + '進法の数値として不適切です。';
+    }
     if (m = msg.match(/^could not convert string to float: (\'[^\']+\')$/))
         return '文字列 ' + m[1] + ' を float 型に変換することはできません。';
     // AttributeError
@@ -351,7 +360,7 @@ function getMessage(msg, error_type) {
     if (m = msg.match(/^\[Errno \d+\] No such file or directory: '([^\']+)'$/))
         return 'ファイル「' + m[1] + '」が見つかりません。スペルミス等をしていないか確認してください。';
     // ZeroDivisionError
-    if ('division by zero' == msg)
+    if (m = msg.match(/^(float )?division by zero$/))
         return '0 で割ることはできません。除数（割る数）が予期せず 0 になっていないか確認してください。';
     // その他のエラー
     return msg
