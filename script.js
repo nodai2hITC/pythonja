@@ -183,7 +183,7 @@ function outputError(error) {
 
     if (!filename) return;
     script = getScript(script, filename, lineno)
-    let error_message = getMessage(message, type, script);
+    let error_message = getMessage(message, type, script, lineno);
     lint_data = [{
         severity: "error",
         from: { line: lineno - 1, ch: 0 },
@@ -252,19 +252,25 @@ function getScript(script, filename, lineno) {
     return "    " + editor.getValue().split("\n")[lineno - 1].toString().trim();
 }
 
-function getMessage(msg, error_type, script) {
+function getMessage(msg, error_type, script, lineno) {
     let m;
     // SyntaxError
-    if ('invalid syntax' == msg)
+    if ('invalid syntax' == msg) {
+        if (script.match(/^\s*for\s+/) && script.indexOf('in') == -1)
+            return '文法が正しくありません。in を忘れていませんか？'
         return '文法が正しくありません。入力ミス等が無いか確認してください。';
+    }
     if (m = msg.match(/^'([^\']+)' was never closed$/))
         return '「' + m[1] + '」を閉じ忘れています。';
     if (m = msg.match(/^unterminated (?:triple-quoted )?string literal \(detected at line (\d+)\)$/))
         return '文字列が閉じられていません。クォートを忘れていませんか？（' + m[1] + '行目で検出）';
     if (m = msg.match(/^EOF while scanning (?:triple-quoted )?string literal$/))
         return '文字列が閉じられていません。クォートを忘れていませんか？';
-    if ("expected ':'" == msg)
+    if ("expected ':'" == msg) {
+        if (script.match(/^\s*else\s+.+?[=<>].+?\:/))
+            return 'else の後に条件式を書くことはできません。elif を使うか、あるいは条件式を消す必要があります。';
         return 'コロン「:」を忘れています。';
+    }
     if ('invalid syntax. Perhaps you forgot a comma?' == msg)
         return '文法が正しくありません。コンマ「,」を忘れていませんか？';
     if ("invalid syntax. Maybe you meant '==' or ':=' instead of '='?" == msg)
@@ -291,7 +297,12 @@ function getMessage(msg, error_type, script) {
         return '全角の ' + m[1] + ' が使われています。英語入力状態で書き直してください。';
     if (m = msg.match(/^invalid character '(.)' \(([^\)]+)\)$/))
         return '不正な文字 ' + m[1] + ' が使われています。';
-
+    if ("Did you mean to use 'from ... import ...' instead?" == msg)
+        return 'from ... import ... と書くべきところを、import ... from ... と書いてしまっていませんか？'
+    if ('leading zeros in decimal integer literals are not permitted; use an 0o prefix for octal integers' == msg)
+        return '数値の前に 0 を入れてはいけません。'
+    if ('invalid decimal literal' == msg)
+        return '不正な数値データです。数字から始まる変数名を使っていたりしませんか？'
     // IndentationError, TabError
     if ('unexpected indent' == msg)
         return 'インデントが入るべきでない場所に入ってしまっています。';
@@ -300,7 +311,7 @@ function getMessage(msg, error_type, script) {
     if ('unindent does not match any outer indentation level' == msg)
         return '合わせるべきインデントが合っていません。';
     if (m = msg.match(/^expected an indented block after '([^']+)' statement [oi]n line (\d+)$/))
-        return '' + m[2] + '行目の ' + m[1] + ' の後に、インデントがありません。';
+        return `${m[2]}行目の ${m[1]} の次行（つまり ${lineno}行目）に、インデントがありません。`;
     if ('inconsistent use of tabs and spaces in indentation' == msg)
         return 'インデントにタブとスペースが混在しています。';
     // IndexError
@@ -314,7 +325,10 @@ function getMessage(msg, error_type, script) {
     if (m = msg.match(/^name '([^\']+)' is not defined. Did you mean: '([^\']+)'\?$/))
         return '「' + m[1] + '」という名前の変数などは見つかりませんでした。「' + m[2] + '」の入力ミスではありませんか？';
     if (m = msg.match(/^name '([^\']+)' is not defined$/))
-        return '「' + m[1] + '」という名前の変数などは見つかりませんでした。スペルミスや、大文字小文字の打ち間違い等をしていないか確認してください。';
+        return '「' + m[1] + '」という名前の変数などは見つかりませんでした。クォーテーションを忘れていたり、スペルミスや大文字小文字の打ち間違いをしていないか確認してください。';
+    // UnboundLocalError
+    if (m = msg.match(/^cannot access local variable '([^\']+)' where it is not associated with a value$/))
+        return '関数内でまだ定義されていない「' + m[1] + '」という名前のローカル変数が使われています。';
     // TypeError
     if (m = msg.match(/^can only concatenate str \(not "([^"]+)"\) to str$/))
         return '文字列に ' + getType(m[1], "のデータ") + 'を結合することはできません。';
@@ -338,7 +352,7 @@ function getMessage(msg, error_type, script) {
     }
     // ValueError
     if (m = msg.match(/^invalid literal for int\(\) with base (\d+): (\'[^\']*\')$/)) {
-        if (m[1] == '10') return '文字列 ' + m[2] + ' は、int型（整数）に変換することができません。';
+        if (m[1] == '10') return '文字列 ' + m[2] + ' は、整数として不正なので int型（整数）に変換することができません。';
         else              return '文字列 ' + m[2] + ' は、' + m[1] + '進法の数値として不適切です。';
     }
     if (m = msg.match(/^could not convert string to float: (\'[^\']+\')$/))
