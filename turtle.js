@@ -75,7 +75,7 @@ class Turtle:
         else:
             new_pos = Vec2D(x, y)
         pensize = self._pensize if self._pendown else 0
-        time = distance / 4 / self._speed if self._speed > 0 else 0
+        time = math.sqrt((self._pos[0] - new_pos[0])**2 + (self._pos[1] - new_pos[1])**2) / 2 / self._speed if self._speed > 0 else 0
         self._log.append([new_pos[0], new_pos[1], self._angle, time, pensize])
         self._pos = new_pos
 
@@ -98,6 +98,20 @@ class Turtle:
     def home(self):
         self.goto(0, 0)
         self.setheading(0)
+
+    def penup(self):
+        self._pendown = False
+    pu = penup
+    up = penup
+
+    def pendown(self):
+        self._pendown = True
+    pd = pendown
+    down = pendown
+
+    def pensize(self, size):
+        self._pensize = size
+    width = pensize
 
     def speed(self, sp=None):
         if sp is None:
@@ -148,6 +162,20 @@ def home():
 
 def speed(sp=None):
     turtles[0].speed(sp)
+
+def pensize(size):
+    turtles[0].pensize(size)
+width = pensize
+
+def penup():
+    turtles[0].penup()
+pu = penup
+up = penup
+
+def pendown():
+    turtles[0].pendown()
+pd = pendown
+down = pendown
 
 def done():
     js.done(turtles[0].to_json())
@@ -202,15 +230,18 @@ function draw(){
 }
 
 function line(x1, y1, x2, y2, angle, new_angle, t, dt, pensize) {
-    ct.beginPath();
-    ct.lineWidth = pensize;
-    if (t < dt) {
-        x2 = x1 + (x2 - x1) * t / dt
-        y2 = y1 + (y2 - y1) * t / dt
-        new_angle = angle + (new_angle - angle) * t / dt;
+    if (pensize > 0) {
+        ct.beginPath();
+        ct.moveTo(x1, y1);
+        ct.lineWidth = pensize;
+        if (t < dt) {
+            x2 = x1 + (x2 - x1) * t / dt
+            y2 = y1 + (y2 - y1) * t / dt
+            new_angle = angle + (new_angle - angle) * t / dt;
+        }
+        ct.lineTo(x2, y2);
+        ct.stroke();
     }
-    ct.lineTo(x2, y2);
-    ct.stroke();
     return [x2, y2, new_angle % 360];
 }
 
