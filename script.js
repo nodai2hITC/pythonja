@@ -143,6 +143,10 @@ def new_matplotlib_pyplot_show():
 matplotlib.pyplot.show = new_matplotlib_pyplot_show
 `)
         }
+        if (document.getElementById("turtle")) {
+            pyodide.runPython(turtle_py);
+            draw();
+        }
         pyodide.runPython(`
 import js
 def new_input(s="入力してください："):
@@ -166,6 +170,10 @@ function run() {
 async function evaluatePython() {
     let pyodide = await pyodideReadyPromise;
     try {
+        if (document.getElementById("turtle")) {
+            pyodide.runPython(`import turtle
+turtle.turtles = [turtle.Turtle()]`);
+        }
         pyodide.runPython(editor.getValue(), { globals : pyodide.toPy({})});
     } catch (err) {
         outputError(err.toString());

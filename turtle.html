@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/addon/lint/lint.min.css" />
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/mode/python/python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/addon/lint/lint.min.js"></script>
+    <script defer src="turtle.js"></script>
+    <script defer src="script.js"></script>
+    <script>
+      const python_packages = [];
+      document.addEventListener("domContentLoaded", function(){ window.requestAnimationFrame(draw); } );
+    </script>
+    <title>Python 実行環境</title>
+    <meta name="description" content="ブラウザ上で完結する Python 実行環境です。エラーメッセージ日本語表示。" />
+  </head>
+
+  <body>
+    <canvas id="turtle" width="600" height="600"></canvas>
+    <textarea id="txt-editor">import turtle
+turtle.fd(200)
+turtle.left(90)
+turtle.fd(200)
+turtle.done()
+</textarea>
+    <p class="menu">
+      <button onclick="clearAll();" id="clear"><img src="data:image/svg+xml;base64,PCEtLT94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPy0tPgo8IS0tIEdlbmVyYXRvcjogQWRvYmUgSWxsdXN0cmF0b3IgMTguMC4wLCBTVkcgRXhwb3J0IFBsdWctSW4gLiBTVkcgVmVyc2lvbjogNi4wMCBCdWlsZCAwKSAgLS0+Cgo8c3ZnIHZlcnNpb249IjEuMSIgaWQ9Il94MzJfIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB4PSIwcHgiIHk9IjBweCIgdmlld0JveD0iMCAwIDUxMiA1MTIiIHN0eWxlPSJ3aWR0aDogMjU2cHg7IGhlaWdodDogMjU2cHg7IG9wYWNpdHk6IDE7IiB4bWw6c3BhY2U9InByZXNlcnZlIj4KPHN0eWxlIHR5cGU9InRleHQvY3NzIj4KCS5zdDB7ZmlsbDojNEI0QjRCO30KPC9zdHlsZT4KPGc+Cgk8cGF0aCBjbGFzcz0ic3QwIiBkPSJNNzcuODY5LDQ0OC45M2MwLDEzLjMxMiwxLjYyMywyNS42NTIsNS4yNzUsMzUuOTYxYzQuOTUxLDEzLjYzNiwxMy40NzUsMjMuNDU3LDI2LjI5OSwyNi4yOTcKCQljMi41OTgsMC40ODgsNS4yNzcsMC44MTIsOC4xMTcsMC44MTJoMjc3LjM2NGMwLjczLDAsMS4zODEsMCwxLjk0Ny0wLjA4MmMyNi40NjMtMS43MDMsMzcuMjU4LTI5LjIxOSwzNy4yNTgtNjIuOTg4CgkJbDExLjEyMS0yNjkuMzI0SDY2Ljc0OEw3Ny44NjksNDQ4LjkzeiBNMzMxLjUyOSwyMzkuNjcyaDUyLjY4djIxMi4yNjJoLTUyLjY4VjIzOS42NzJ6IE0yMjkuNjU4LDIzOS42NzJoNTIuNjgydjIxMi4yNjJoLTUyLjY4MgoJCVYyMzkuNjcyeiBNMTI3Ljc4OSwyMzkuNjcyaDUyLjc2MnYyMTIuMjYyaC01Mi43NjJWMjM5LjY3MnoiIHN0eWxlPSJmaWxsOiByZ2IoNzUsIDc1LCA3NSk7Ij48L3BhdGg+Cgk8cGF0aCBjbGFzcz0ic3QwIiBkPSJNMzY4LjY2Niw4OS4yODljMC4wNzgtMi4wMjgsMC4yNDItNC4wNTksMC4yNDItNi4wOXYtNS41OThjMC00Mi43NzctMzQuODIyLTc3LjYwMi03Ny42LTc3LjYwMmgtNzAuNzAxCgkJYy00Mi43NzgsMC03Ny42LDM0LjgyNC03Ny42LDc3LjYwMnY1LjU5OGMwLDIuMDMxLDAuMTYyLDQuMDYyLDAuMzI2LDYuMDlIMjguNzIxdjYyLjU4Mmg0NTQuNTU4Vjg5LjI4OUgzNjguNjY2eiBNMzIwLjIwNSw4My4xOTkKCQljMCwyLjExMy0wLjI0Miw0LjE0MS0wLjY0OCw2LjA5SDE5Mi4zNjFjLTAuNDA2LTEuOTQ5LTAuNjUtMy45NzctMC42NS02LjA5di01LjU5OGMwLTE1LjkxLDEyLjk4Ni0yOC44OTgsMjguODk3LTI4Ljg5OGg3MC43MDEKCQljMTUuOTksMCwyOC44OTYsMTIuOTg4LDI4Ljg5NiwyOC44OThWODMuMTk5eiIgc3R5bGU9ImZpbGw6IHJnYig3NSwgNzUsIDc1KTsiPjwvcGF0aD4KPC9nPgo8L3N2Zz4K"/>全消去</button>
+      <button onclick="copy();" id="copy">コードをコピー</button>
+      <button onclick="save();" id="save">一時保存</button>
+      <button onclick="load();" id="load">一時保存からの読み込み</button>
+      <a id="download" download="python.py"><button onclick="download();">ダウンロード</button></a>
+      <button onclick="urlCopy();" id="copy">URL をコピー</button>
+    </p>
+    <p>
+      <button onclick="clear_turtle();run();draw();" id="run" disabled>準備中</button>
+      <input type="checkbox" id="reset_output" checked /><label for="reset_output">実行結果を毎回</label><span ondblclick="output.innerHTML = ''">消去</span>する
+    </p>
+    <p>実行結果:</p>
+    <pre id="output">初期化中...</pre>
+  </body>
+</html>
