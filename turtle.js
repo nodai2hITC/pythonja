@@ -223,6 +223,7 @@ function draw(){
     ct.beginPath()
     ct.moveTo(x, y)
     ct.lineTo(x + 10 * Math.cos((angle + 150) * Math.PI * 2 / 360), y + 10 * Math.sin((angle + 150) * Math.PI * 2 / 360))
+    ct.lineTo(x + 7 * Math.cos((angle + 180) * Math.PI * 2 / 360), y + 7 * Math.sin((angle + 180) * Math.PI * 2 / 360))
     ct.lineTo(x + 10 * Math.cos((angle + 210) * Math.PI * 2 / 360), y + 10 * Math.sin((angle + 210) * Math.PI * 2 / 360))
     ct.closePath()
     ct.fill()
