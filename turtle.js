@@ -230,15 +230,15 @@ function draw(){
 }
 
 function line(x1, y1, x2, y2, angle, new_angle, t, dt, pensize) {
+    if (t < dt) {
+        x2 = x1 + (x2 - x1) * t / dt
+        y2 = y1 + (y2 - y1) * t / dt
+        new_angle = angle + (new_angle - angle) * t / dt;
+    }
     if (pensize > 0) {
         ct.beginPath();
         ct.moveTo(x1, y1);
         ct.lineWidth = pensize;
-        if (t < dt) {
-            x2 = x1 + (x2 - x1) * t / dt
-            y2 = y1 + (y2 - y1) * t / dt
-            new_angle = angle + (new_angle - angle) * t / dt;
-        }
         ct.lineTo(x2, y2);
         ct.stroke();
     }
