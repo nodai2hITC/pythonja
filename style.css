@@ -20,6 +20,12 @@ button img {
     height: 1em;
 }
 
+button .material-symbols-outlined {
+    vertical-align: -0.2em;
+    font-size: 1.2em;
+    margin-right: 0.2em;
+}
+
 #output {
     border: solid 1px #999;
     margin: 0;

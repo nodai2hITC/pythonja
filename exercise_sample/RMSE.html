@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/addon/lint/lint.min.css" />
+    <link rel="stylesheet" href="../style.css" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/mode/python/python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/addon/lint/lint.min.js"></script>
+    <script>
+      window.MathJax = {
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']],
+          displayMath: [['$$', '$$'], ['\\[', '\\]']]
+        }
+      };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({ startOnLoad: true });
+    </script>
+    <script defer src="../script.js"></script>
+    <script>
+      const python_packages = ["numpy", "scikit-learn"];
+    </script>
+    <title>Python 演習問題：RMSEの計算</title>
+    <meta name="description" content="NumPy と scikit-learn を使用して RMSE を計算する演習です。" />
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        height: 100vh;
+        overflow: hidden;
+      }
+      .split-container {
+        display: flex;
+        height: 100vh;
+      }
+      .left-panel {
+        flex: 1;
+        padding: 20px;
+        overflow-y: auto;
+        border-right: 2px solid #ddd;
+        background-color: #f9f9f9;
+      }
+      .right-panel {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        padding: 20px;
+        overflow-y: auto;
+      }
+      @media screen and (max-width: 800px) {
+        .split-container {
+          flex-direction: column;
+          overflow: auto;
+        }
+        .left-panel, .right-panel {
+          flex: none;
+          height: auto;
+          border-right: none;
+          border-bottom: 2px solid #ddd;
+        }
+        body {
+          overflow: auto;
+        }
+      }
+      .CodeMirror {
+        height: 400px;
+      }
+      #output {
+        height: 200px;
+        flex-shrink: 0;
+      }
+      p.menu {
+        float: none;
+        margin-bottom: 10px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+      }
+      button {
+        padding: 5px 10px;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="split-container">
+      <div class="left-panel">
+        <h1>演習：RMSE（平方二乗平均平方根誤差）の計算</h1>
+        <section>
+          <h2>問題文</h2>
+          <p>予測モデルの性能評価によく使われる RMSE を、<code>scikit-learn</code> ライブラリの <code>mean_squared_error</code> 関数を使って計算する <code>calculate_rmse(actual, predicted)</code> を実装してください。</p>
+          <p>RMSE は以下の数式で定義されます：</p>
+          <p>$$RMSE = \sqrt{\frac{1}{n} \sum_{i=1}^{n} (y_i - \hat{y}_i)^2}$$</p>
+          <ul>
+            <li>$y_i$ : 実際の値 (actual)</li>
+            <li>$\hat{y}_i$ : 予測された値 (predicted)</li>
+            <li>$n$ : データの個数</li>
+          </ul>
+        </section>
+        
+        <section>
+          <h2>ヒント</h2>
+          <ul>
+            <li><code>from sklearn.metrics import mean_squared_error</code> で関数をインポートできます。</li>
+            <li><code>mean_squared_error(y_true, y_pred, squared=False)</code> とすると、二乗平均平方根誤差（RMSE）を直接計算できます。</li>
+            <li>引数の <code>squared=True</code> (デフォルト) は MSE（二乗平均誤差）を返します。</li>
+          </ul>
+        </section>
+      </div>
+
+      <div class="right-panel">
+        <textarea id="txt-editor">import numpy as np
+from sklearn.metrics import mean_squared_error
+
+def calculate_rmse(actual, predicted):
+    # ここにコードを書いてください
+    # sklearn.metrics.mean_squared_error を使用してください
+    return 0.0
+
+# 動作確認用データ
+y_true = np.array([1, 2, 3])
+y_pred = np.array([1.5, 2.5, 3.5])
+print("結果:", calculate_rmse(y_true, y_pred))
+</textarea>
+        
+        <p class="menu">
+          <button onclick="resetCode();" id="reset"><span class="material-symbols-outlined">restart_alt</span>初期状態に戻す</button>
+          <button onclick="clearAll();" id="clear"><span class="material-symbols-outlined">delete</span>全消去</button>
+          <button onclick="copy();" id="copy"><span class="material-symbols-outlined">content_copy</span>コードをコピー</button>
+          <button onclick="save();" id="save"><span class="material-symbols-outlined">save</span>一時保存</button>
+          <button onclick="load();" id="load"><span class="material-symbols-outlined">file_open</span>一時保存からの読み込み</button>
+          <a id="download" download="python.py"><button onclick="download();"><span class="material-symbols-outlined">download</span>ダウンロード</button></a>
+          <button onclick="urlCopy();" id="copy"><span class="material-symbols-outlined">link</span>URL をコピー</button>
+        </p>
+        
+        <p>
+          <button onclick="run();" id="run" disabled><span class="material-symbols-outlined">play_arrow</span>準備中</button>
+          <button onclick="submit();" id="submit" disabled><span class="material-symbols-outlined">send</span>提出</button>
+          <input type="checkbox" id="reset_output" checked /><label for="reset_output">実行結果を毎回</label><span ondblclick="output.innerHTML = ''">消去</span>する
+        </p>
+        
+        <p>実行結果:</p>
+        <pre id="output">初期化中...</pre>
+      </div>
+    </div>
+
+    <!-- 事前処理用コード -->
+    <script id="pre-code" type="text/plain">
+import numpy as np
+from sklearn.metrics import mean_squared_error
+# 正誤判定用の隠しデータ
+actual_data = np.array([3, -0.5, 2, 7])
+predicted_data = np.array([2.5, 0.0, 2, 8])
+    </script>
+
+    <!-- 正誤判定用コード -->
+    <script id="check-code" type="text/plain">
+is_correct = False
+try:
+    if "calculate_rmse" in globals():
+        res = calculate_rmse(actual_data, predicted_data)
+        ans = mean_squared_error(actual_data, predicted_data, squared=False)
+        
+        if np.isclose(res, ans):
+            print("\n【判定】正解です！")
+            print(f"テストデータでの計算結果: {res:.5f}")
+            is_correct = True
+        else:
+            print("\n【判定】不正解です。")
+            print(f"期待される結果: {ans:.5f}")
+            print(f"あなたの関数の結果: {res}")
+    else:
+        print("\n【判定】calculate_rmse 関数が定義されていません。")
+except Exception as e:
+    print(f"\n【判定】エラーが発生しました: {e}")
+    </script>
+  </body>
+</html>
