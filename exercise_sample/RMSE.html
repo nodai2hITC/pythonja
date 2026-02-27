@@ -110,9 +110,20 @@
         <section>
           <h2>ヒント</h2>
           <ul>
-            <li><code>from sklearn.metrics import mean_squared_error</code> で関数をインポートできます。</li>
-            <li><code>mean_squared_error(y_true, y_pred, squared=False)</code> とすると、二乗平均平方根誤差（RMSE）を直接計算できます。</li>
-            <li>引数の <code>squared=True</code> (デフォルト) は MSE（二乗平均誤差）を返します。</li>
+            <li>
+              <details>
+                <summary>ヒント1</summary>
+                <p><code>mean_squared_error(y_true, y_pred)</code> とすると、二乗平均誤差（MSE）を計算できます。</p>
+              </details>
+            </li>
+          </ul>
+          <ul>
+            <li>
+              <details>
+                <summary>ヒント2</summary>
+                <p><code>np.sqrt(n)</code> とすると、平方根を計算できます。</p>
+              </details>
+            </li>
           </ul>
         </section>
       </div>
@@ -123,7 +134,7 @@ from sklearn.metrics import mean_squared_error
 
 def calculate_rmse(actual, predicted):
     # ここにコードを書いてください
-    # sklearn.metrics.mean_squared_error を使用してください
+    # mean_squared_error(sklearn.metrics.mean_squared_error) を使用してください
     return 0.0
 
 # 動作確認用データ
