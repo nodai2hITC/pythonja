@@ -141,6 +141,7 @@ function stderrFunc(str){
 }
 
 async function main() {
+    addToOutput(escapeHTML(""));
     let pyodide = await loadPyodide({stdin: stdinFunc, stdout: stdoutFunc, stderr: stderrFunc});
     await pyodide.loadPackage(python_packages).then(() => {
         if (python_packages.includes("matplotlib")){
