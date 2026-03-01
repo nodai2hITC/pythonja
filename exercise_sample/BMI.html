@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/addon/lint/lint.min.css" />
+    <link rel="stylesheet" href="../style.css" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.29.3/full/pyodide.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/mode/python/python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/addon/lint/lint.min.js"></script>
+    <script>
+      window.MathJax = {
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']],
+          displayMath: [['$$', '$$'], ['\\[', '\\]']]
+        }
+      };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({ startOnLoad: true });
+    </script>
+    <script defer src="../script.js"></script>
+    <script>
+      const python_packages = ["numpy"];
+    </script>
+    <title>Python 演習問題：BMI の計算と判定</title>
+    <meta name="description" content="BMI を計算し、その結果から体格を判定するプログラムを実装する演習です。" />
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        height: 100vh;
+        overflow: hidden;
+      }
+      .split-container {
+        display: flex;
+        height: 100vh;
+      }
+      .left-panel {
+        flex: 1;
+        padding: 20px;
+        overflow-y: auto;
+        border-right: 2px solid #ddd;
+        background-color: #f9f9f9;
+      }
+      .right-panel {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        padding: 20px;
+        overflow-y: auto;
+      }
+      @media screen and (max-width: 800px) {
+        .split-container {
+          flex-direction: column;
+          overflow: auto;
+        }
+        .left-panel, .right-panel {
+          flex: none;
+          height: auto;
+          border-right: none;
+          border-bottom: 2px solid #ddd;
+        }
+        body {
+          overflow: auto;
+        }
+      }
+      .CodeMirror {
+        height: 400px;
+      }
+      #output {
+        height: 200px;
+        flex-shrink: 0;
+      }
+      p.menu {
+        float: none;
+        margin-bottom: 10px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+      }
+      button {
+        padding: 5px 10px;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="split-container">
+      <div class="left-panel">
+        <h1>演習：BMI の計算と判定</h1>
+        <section>
+          <h2>問題文</h2>
+          <p>体重 (kg) と身長 (m) を引数として受け取り、BMI を計算して体格を判定する関数 <code>classify_bmi(weight, height)</code> を実装してください。</p>
+          <p>BMI は以下の数式で計算されます：</p>
+          <p>$$BMI = \frac{\text{weight (kg)}}{\text{height (m)}^2}$$</p>
+          <p>計算された BMI の値に応じて、以下の文字列を返してください：</p>
+          <ul>
+            <li>BMI &lt; 18.5 : <code>"Underweight"</code></li>
+            <li>18.5 &le; BMI &lt; 25.0 : <code>"Normal"</code></li>
+            <li>25.0 &le; BMI &lt; 30.0 : <code>"Overweight"</code></li>
+            <li>BMI &ge; 30.0 : <code>"Obese"</code></li>
+          </ul>
+        </section>
+        
+        <section>
+          <h2>判定ロジック</h2>
+          <div class="mermaid">
+            graph TD
+              Start([開始]) --> Calc[BMIを計算]
+              Calc --> Cond1{BMI &lt; 18.5 ?}
+              Cond1 -- Yes --> Res1[Underweight]
+              Cond1 -- No --> Cond2{BMI &lt; 25.0 ?}
+              Cond2 -- Yes --> Res2[Normal]
+              Cond2 -- No --> Cond3{BMI &lt; 30.0 ?}
+              Cond3 -- Yes --> Res3[Overweight]
+              Cond3 -- No --> Res4[Obese]
+              Res1 --> End([終了])
+              Res2 --> End
+              Res3 --> End
+              Res4 --> End
+          </div>
+        </section>
+
+        <section>
+          <h2>ヒント</h2>
+          <ul>
+            <li>
+              <details>
+                <summary>ヒント1</summary>
+                <p>身長の二乗は <code>height ** 2</code> で計算できます。</p>
+              </details>
+            </li>
+            <li>
+              <details>
+                <summary>ヒント2</summary>
+                <p><code>if-elif-else</code> 構文を使って条件を分岐させましょう。</p>
+              </details>
+            </li>
+          </ul>
+        </section>
+      </div>
+
+      <div class="right-panel">
+        <textarea id="txt-editor">
+def classify_bmi(weight, height):
+    # ここにコードを書いてください
+    # 1. BMI を計算する
+    # 2. 条件分岐で判定結果の文字列を返す
+    return ""
+
+# 動作確認
+print("判定結果:", classify_bmi(65, 1.7)) # Normal (BMIは約22.5)
+</textarea>
+        
+        <p class="menu">
+          <button onclick="resetCode();" id="reset"><span class="material-symbols-outlined">restart_alt</span>初期状態に戻す</button>
+          <button onclick="clearAll();" id="clear"><span class="material-symbols-outlined">delete</span>全消去</button>
+          <button onclick="copy();" id="copy"><span class="material-symbols-outlined">content_copy</span>コードをコピー</button>
+          <button onclick="save();" id="save"><span class="material-symbols-outlined">save</span>一時保存</button>
+          <button onclick="load();" id="load"><span class="material-symbols-outlined">file_open</span>一時保存からの読み込み</button>
+          <a id="download" download="python.py"><button onclick="download();"><span class="material-symbols-outlined">download</span>ダウンロード</button></a>
+          <button onclick="urlCopy();" id="copy"><span class="material-symbols-outlined">link</span>URL をコピー</button>
+        </p>
+        
+        <p>
+          <button onclick="run();" id="run" disabled><span class="material-symbols-outlined">play_arrow</span>準備中</button>
+          <button onclick="submit();" id="submit" disabled><span class="material-symbols-outlined">send</span>提出</button>
+          <input type="checkbox" id="reset_output" checked /><label for="reset_output">実行結果を毎回</label><span ondblclick="output.innerHTML = ''">消去</span>する
+        </p>
+        
+        <p>実行結果:</p>
+        <pre id="output">初期化中...</pre>
+      </div>
+    </div>
+
+    <!-- 事前処理用コード -->
+    <script id="pre-code" type="text/plain">
+# 正解判定用の関数を定義
+def _correct_bmi(w, h):
+    bmi = w / (h ** 2)
+    if bmi < 18.5: return "Underweight"
+    if bmi < 25.0: return "Normal"
+    if bmi < 30.0: return "Overweight"
+    return "Obese"
+
+# テストケース
+test_cases = [
+    (50, 1.7), (65, 1.7), (80, 1.7), (100, 1.7)
+]
+    </script>
+
+    <!-- 正誤判定用コード -->
+    <script id="check-code" type="text/plain">
+is_correct = False
+try:
+    if "classify_bmi" in globals():
+        all_passed = True
+        for w, h in test_cases:
+            user_res = classify_bmi(w, h)
+            expected = _correct_bmi(w, h)
+            if user_res != expected:
+                print(f"失敗: 体重{w}kg, 身長{h}m の場合、期待される値は '{expected}' ですが、あなたの結果は '{user_res}' でした。")
+                all_passed = False
+                break
+        
+        if all_passed:
+            print("\n【判定】正解です！全てのテストケースを通過しました。")
+            is_correct = True
+    else:
+        print("\n【判定】classify_bmi 関数が定義されていません。")
+except Exception as e:
+    print(f"\n【判定】エラーが発生しました: {e}")
+    </script>
+  </body>
+</html>

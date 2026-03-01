@@ -46,6 +46,8 @@ if (location.href.indexOf("#") != -1) {
     editor.setValue(base64decode(location.hash.replace("#", "")));
 }
 
+const initial_code = editor.getValue();
+
 function base64encode(str) {
     let uint8arr = new TextEncoder().encode(str);
     let binStr = Array.from(uint8arr).map(b => String.fromCharCode(b)).join("");
@@ -61,6 +63,12 @@ function base64decode(str) {
 function clearAll() {
     if (!confirm("白紙の状態に戻します。よろしいですか？")) return;
     editor.setValue("");
+    editor.focus();
+}
+
+function resetCode() {
+    if (!confirm("初期状態に戻します。よろしいですか？")) return;
+    editor.setValue(initial_code);
     editor.focus();
 }
 
@@ -91,16 +99,26 @@ function download() {
 
 const output = document.getElementById("output");
 const run_button = document.getElementById("run");
+const submit_button = document.getElementById("submit");
 run_button.disabled = true;
+if (submit_button) submit_button.disabled = true;
 
 function enableRunButton() {
     run_button.disabled = false;
-    run_button.innerText = "▶実行";
+    run_button.innerHTML = '<span class="material-symbols-outlined">play_arrow</span>実行';
+    if (submit_button) {
+        submit_button.disabled = false;
+        submit_button.innerHTML = '<span class="material-symbols-outlined">send</span>提出';
+    }
 }
 
 function disableRunButton() {
     run_button.disabled = true;
-    run_button.innerText = "実行中";
+    run_button.innerHTML = '<span class="material-symbols-outlined">progress_activity</span>実行中';
+    if (submit_button) {
+        submit_button.disabled = true;
+        submit_button.innerHTML = '<span class="material-symbols-outlined">progress_activity</span>提出中';
+    }
 }
 
 function escapeHTML(text) {
@@ -123,6 +141,7 @@ function stderrFunc(str){
 }
 
 async function main() {
+    addToOutput(escapeHTML(""));
     let pyodide = await loadPyodide({stdin: stdinFunc, stdout: stdoutFunc, stderr: stderrFunc});
     await pyodide.loadPackage(python_packages).then(() => {
         if (python_packages.includes("matplotlib")){
@@ -164,17 +183,41 @@ function run() {
     disableRunButton();
     if (document.getElementById("reset_output").checked) output.innerHTML = "";
     else output.innerHTML += "\n";
-    setTimeout(evaluatePython);
+    setTimeout(() => evaluatePython(false));
 }
 
-async function evaluatePython() {
+function submit() {
+    disableRunButton();
+    if (document.getElementById("reset_output").checked) output.innerHTML = "";
+    else output.innerHTML += "\n";
+    setTimeout(() => evaluatePython(true));
+}
+
+async function evaluatePython(isSubmit = false) {
     let pyodide = await pyodideReadyPromise;
     try {
         if (document.getElementById("turtle")) {
             pyodide.runPython(`import turtle
 turtle.turtles = [turtle.Turtle()]`);
         }
-        pyodide.runPython(editor.getValue(), { globals : pyodide.toPy({})});
+        let code = "";
+        const preCode = document.getElementById("pre-code");
+        if (preCode) {
+            code += preCode.innerText + "\n";
+        }
+        code += editor.getValue();
+        if (isSubmit) {
+            const checkCode = document.getElementById("check-code");
+            if (checkCode) {
+                code += "\n" + checkCode.innerText;
+            }
+        }
+        const py_globals = pyodide.toPy({});
+        pyodide.runPython(code, { globals : py_globals });
+        if (isSubmit && py_globals.get("is_correct") === true) {
+            setTimeout(() => alert("正解！"), 100);
+        }
+        py_globals.destroy();
     } catch (err) {
         outputError(err.toString());
     } finally {
@@ -187,6 +230,14 @@ turtle.turtles = [turtle.Turtle()]`);
 
 function outputError(error) {
     let [original_error, filename, lineno, in_, script, type, message] = analyze(error);
+    
+    // 行数の補正 (pre-code の行数を引く)
+    const preCode = document.getElementById("pre-code");
+    if (filename == "<exec>" && preCode) {
+        const offset = preCode.innerText.split("\n").length;
+        lineno -= offset;
+    }
+
     addToOutput('<span class="original_error">' + escapeHTML(original_error) + '</span>');
 
     if (!filename) return;
